@@ -13,7 +13,15 @@ async function handler(req, res) {
     } catch (err) {
       res.status(500).json({ success: false, message: 'Database error' });
     }
+  } else if (req.method === 'GET') {
+    try {
+      const result = await db.query('SELECT * FROM form_submissions ORDER BY id DESC');
+      res.status(200).json(result.rows);
+    } catch (err) {
+      res.status(500).json({ success: false, message: 'Database error' });
+    }
   } else {
+    res.setHeader('Allow', ['GET', 'POST']);
     res.status(405).json({ message: 'Method Not Allowed' });
   }
 }
