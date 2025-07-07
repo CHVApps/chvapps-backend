@@ -8,9 +8,12 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
+app.get('/', (req, res) => {
+  res.send('CHV Apps Backend is running');
+});
+
 app.post('/api/form-submissions', async (req, res) => {
   const { name, email, mobile_number, type, subject, internship, course, message } = req.body;
-
   try {
     const result = await db.query(
       `INSERT INTO form_submissions 
@@ -47,7 +50,6 @@ app.get('/api/categories', async (req, res) => {
 
 app.post('/api/categories', async (req, res) => {
   const { name, type } = req.body;
-
   try {
     await db.query(
       `INSERT INTO categories (name, type) VALUES ($1, $2)`,
@@ -72,11 +74,9 @@ app.get('/api/courses-internships', async (req, res) => {
 
 app.post('/api/courses-internships', async (req, res) => {
   const { name, type } = req.body;
-
   if (!name || !type) {
     return res.status(400).json({ success: false, message: 'Name and Type are required' });
   }
-
   try {
     await db.query(
       `INSERT INTO "courses-internships" (name, type) VALUES ($1, $2)`,
@@ -90,5 +90,5 @@ app.post('/api/courses-internships', async (req, res) => {
 });
 
 app.listen(process.env.PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${process.env.PORT}`);
+  console.log(`Server running on http://localhost:${process.env.PORT}`);
 });
