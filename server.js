@@ -5,7 +5,13 @@ const db = require('./db');
 require('dotenv').config();
 
 const app = express();
-app.use(cors());
+
+app.use(cors({
+  origin: ['https://chvapps.in', 'http://localhost:3000'],
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type']
+}));
+
 app.use(bodyParser.json());
 
 app.get('/', (req, res) => {
@@ -89,6 +95,6 @@ app.post('/api/courses-internships', async (req, res) => {
   }
 });
 
-app.listen(process.env.PORT, () => {
-  console.log(`Server running on http://localhost:${process.env.PORT}`);
+app.listen(process.env.PORT || 5000, () => {
+  console.log(`Server running`);
 });
