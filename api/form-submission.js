@@ -1,13 +1,7 @@
-export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*'); // or set to https://chvapps.in for stricter security
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+import db from '../db';
+import { allowCors } from '../utils/cors';
 
-  if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
-  }
-
+async function handler(req, res) {
   if (req.method === 'POST') {
     const { name, email, mobile_number, type, subject, internship, course, message } = req.body;
     try {
@@ -23,3 +17,5 @@ export default async function handler(req, res) {
     res.status(405).json({ message: 'Method Not Allowed' });
   }
 }
+
+export default allowCors(handler);

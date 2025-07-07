@@ -1,9 +1,9 @@
 import db from '../db';
+import { allowCors } from '../utils/cors';
 
-export default async function handler(req, res) {
+async function handler(req, res) {
   if (req.method === 'POST') {
     const { name, type } = req.body;
-
     try {
       await db.query(`INSERT INTO categories (name, type) VALUES ($1, $2)`, [name, type]);
       res.status(201).json({ success: true });
@@ -22,3 +22,5 @@ export default async function handler(req, res) {
     res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 }
+
+export default allowCors(handler);
