@@ -13,6 +13,10 @@ async function handler(req, res) {
   }
 
   try {
+    if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
+      return res.status(500).json({ message: 'Razorpay credentials are not configured' });
+    }
+
     const { full_name, mobile, email, course_name } = req.body || {};
 
     const name = String(full_name || '').trim();
@@ -58,7 +62,7 @@ async function handler(req, res) {
       currency: 'INR',
       receipt: enrollment.id,
       notes: {
-        enrollment_id: enrollment.id,
+        enrollment_id: String(enrollment.id),
         course_name: course,
         full_name: name,
         email: mail,
@@ -108,4 +112,4 @@ async function handler(req, res) {
   }
 }
 
-export default allowCors(handler);payment-verify.js
+export default allowCors(handler);

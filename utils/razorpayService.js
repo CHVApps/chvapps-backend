@@ -8,6 +8,10 @@ class RazorpayService {
   }
 
   async createOrder({ amountPaise, currency = 'INR', receipt, notes = {} }) {
+    if (!this.keyId || !this.keySecret) {
+      throw new Error('Razorpay credentials are missing');
+    }
+
     const auth = Buffer.from(`${this.keyId}:${this.keySecret}`).toString('base64');
 
     const response = await fetch(`${this.baseUrl}/orders`, {
@@ -19,8 +23,7 @@ class RazorpayService {
       body: JSON.stringify({
         amount: Number(amountPaise),
         currency,
-        receipt: receipt || String(Date.now()),
-        payment_capture: 1,
+        receipt: String(receipt || Date.now()),
         notes
       })
     });
@@ -35,6 +38,10 @@ class RazorpayService {
   }
 
   verifyPaymentSignature({ orderId, paymentId, signature }) {
+    if (!this.keySecret) {
+      throw new Error('Razorpay secret is missing');
+    }
+
     const generatedSignature = crypto
       .createHmac('sha256', this.keySecret)
       .update(`${orderId}|${paymentId}`)
