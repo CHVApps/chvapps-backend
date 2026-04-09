@@ -1,4 +1,4 @@
-import db from '../db.js';
+import db from '../paymentsDb.js';
 import RazorpayService from '../utils/razorpayService.js';
 
 export const config = {

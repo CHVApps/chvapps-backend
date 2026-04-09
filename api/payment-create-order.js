@@ -1,4 +1,4 @@
-import db from '../db.js';
+import db from '../paymentsDb.js';
 import { allowCors } from '../utils/cors.js';
 import RazorpayService from '../utils/razorpayService.js';
 
@@ -13,6 +13,10 @@ async function handler(req, res) {
   }
 
   try {
+    if (!process.env.DATABASE_URL_PAYMENTS) {
+      return res.status(500).json({ message: 'Payments database is not configured' });
+    }
+
     if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
       return res.status(500).json({ message: 'Razorpay credentials are not configured' });
     }
@@ -60,7 +64,7 @@ async function handler(req, res) {
     const order = await razorpay.createOrder({
       amountPaise: Math.round(amount * 100),
       currency: 'INR',
-      receipt: enrollment.id,
+      receipt: String(enrollment.id),
       notes: {
         enrollment_id: String(enrollment.id),
         course_name: course,

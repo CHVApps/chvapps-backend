@@ -1,4 +1,4 @@
-import db from '../db.js';
+import db from '../paymentsDb.js';
 import { allowCors } from '../utils/cors.js';
 import RazorpayService from '../utils/razorpayService.js';
 
