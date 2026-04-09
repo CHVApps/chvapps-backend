@@ -3,8 +3,8 @@ import { allowCors } from '../utils/cors.js';
 import RazorpayService from '../utils/razorpayService.js';
 
 const COURSE_PRICES = {
-  Basics: 999,
-  Advanced: 1999
+  Basics: 1,
+  Advanced: 1
 };
 
 async function handler(req, res) {
