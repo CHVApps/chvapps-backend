@@ -11,7 +11,8 @@ const allowedOrigins = [
   'https://chvapps.in',
   'https://www.chvapps.in',
   'https://chvapps-admin.vercel.app',
-  'http://localhost:3000'
+  'http://localhost:3000',
+  'http://localhost:3001'
 ];
 
 app.use(cors({
