@@ -2,10 +2,8 @@ import db from '../paymentsDb.js';
 import { allowCors } from '../utils/cors.js';
 import RazorpayService from '../utils/razorpayService.js';
 
-const COURSE_PRICES = {
-  Basics: 1,
-  Advanced: 1
-};
+const COURSE_NAME = 'Internship Program';
+const COURSE_FEE = 7000;
 
 async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -21,15 +19,15 @@ async function handler(req, res) {
       return res.status(500).json({ message: 'Razorpay credentials are not configured' });
     }
 
-    const { full_name, mobile, email, course_name } = req.body || {};
+    const { full_name, mobile, email } = req.body || {};
 
     const name = String(full_name || '').trim();
     const phone = String(mobile || '').trim();
     const mail = String(email || '').trim().toLowerCase();
-    const course = String(course_name || '').trim();
+    const course = COURSE_NAME;
 
-    if (!name || !phone || !mail || !course) {
-      return res.status(400).json({ message: 'full_name, mobile, email, course_name are required' });
+    if (!name || !phone || !mail) {
+      return res.status(400).json({ message: 'full_name, mobile, email are required' });
     }
 
     if (!/^[A-Za-z ]{2,150}$/.test(name)) {
@@ -44,11 +42,7 @@ async function handler(req, res) {
       return res.status(400).json({ message: 'Invalid email address' });
     }
 
-    if (!COURSE_PRICES[course]) {
-      return res.status(400).json({ message: 'Invalid course name' });
-    }
-
-    const amount = Number(COURSE_PRICES[course]);
+    const amount = Number(COURSE_FEE);
 
     const enrollmentResult = await db.query(
       `INSERT INTO course_enrollments (full_name, mobile, email, course_name, amount, currency, status)
