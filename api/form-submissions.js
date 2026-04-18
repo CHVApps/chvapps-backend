@@ -3,29 +3,34 @@ import { allowCors } from '../utils/cors';
 
 async function handler(req, res) {
   if (req.method === 'POST') {
-    const {
-      name,
-      email,
-      mobile_number,
-      type,
-      subject,
-      internship,
-      course,
-      message
-    } = req.body;
-
-    if (!name || !email || !mobile_number || !type || !subject || !message) {
-      return res.status(400).json({
-        success: false,
-        message: 'Missing required fields'
-      });
-    }
-
     try {
+      const body =
+        typeof req.body === 'string'
+          ? JSON.parse(req.body)
+          : (req.body || {});
+
+      const {
+        name,
+        email,
+        mobile_number,
+        type,
+        subject,
+        internship,
+        course,
+        message
+      } = body;
+
+      if (!name || !email || !mobile_number || !type || !subject || !message) {
+        return res.status(400).json({
+          success: false,
+          message: 'Missing required fields'
+        });
+      }
+
       const result = await db.query(
-        `INSERT INTO form_submissions 
-        (name, email, mobile_number, type, subject, internship, course, message) 
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8) 
+        `INSERT INTO form_submissions
+        (name, email, mobile_number, type, subject, internship, course, message)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
         RETURNING id`,
         [name, email, mobile_number, type, subject, internship, course, message]
       );
