@@ -1,9 +1,14 @@
-import db from '../db';
-import { allowCors } from '../utils/cors';
+import db from '../db.js';
+import { allowCors } from '../utils/cors.js';
 
 async function handler(req, res) {
   if (req.method === 'POST') {
-    const { name, type } = req.body;
+    const body =
+      typeof req.body === 'string'
+        ? JSON.parse(req.body)
+        : (req.body || {});
+
+    const { name, type } = body;
 
     if (!name || !type) {
       return res.status(400).json({
@@ -18,9 +23,7 @@ async function handler(req, res) {
         [name, type]
       );
 
-      return res.status(201).json({
-        success: true
-      });
+      return res.status(201).json({ success: true });
     } catch (err) {
       console.error('categories POST error:', err);
       return res.status(500).json({
@@ -33,10 +36,7 @@ async function handler(req, res) {
 
   if (req.method === 'GET') {
     try {
-      const result = await db.query(
-        'SELECT * FROM categories ORDER BY id DESC'
-      );
-
+      const result = await db.query('SELECT * FROM categories ORDER BY id DESC');
       return res.status(200).json(result.rows);
     } catch (err) {
       console.error('categories GET error:', err);

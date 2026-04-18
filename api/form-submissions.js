@@ -1,5 +1,5 @@
-import db from '../db';
-import { allowCors } from '../utils/cors';
+import db from '../db.js';
+import { allowCors } from '../utils/cors.js';
 
 async function handler(req, res) {
   if (req.method === 'POST') {
@@ -29,9 +29,9 @@ async function handler(req, res) {
 
       const result = await db.query(
         `INSERT INTO form_submissions
-        (name, email, mobile_number, type, subject, internship, course, message)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-        RETURNING id`,
+         (name, email, mobile_number, type, subject, internship, course, message)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+         RETURNING id`,
         [name, email, mobile_number, type, subject, internship, course, message]
       );
 
