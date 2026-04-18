@@ -3,9 +3,11 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const pool = new Pool({
+const paymentDb = new Pool({
   connectionString: process.env.DATABASE_URL_PAYMENTS,
-  ssl: { rejectUnauthorized: false }
+  ssl: {
+    rejectUnauthorized: false
+  }
 });
 
-export default pool;
+export default paymentDb;

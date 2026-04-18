@@ -3,9 +3,11 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const pool = new Pool({
+const db = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false }
+  ssl: {
+    rejectUnauthorized: false
+  }
 });
 
-export default pool;
+export default db;
