@@ -3,7 +3,6 @@ import { allowCors } from '../utils/cors.js';
 import RazorpayService from '../utils/razorpayService.js';
 
 const COURSE_NAME = 'Internship Program';
-const COURSE_FEE = 7000;
 
 async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -19,15 +18,16 @@ async function handler(req, res) {
       return res.status(500).json({ message: 'Razorpay credentials are not configured' });
     }
 
-    const { full_name, mobile, email } = req.body || {};
+    const { full_name, mobile, email, amount } = req.body || {};
 
     const name = String(full_name || '').trim();
     const phone = String(mobile || '').trim();
     const mail = String(email || '').trim().toLowerCase();
+    const enteredAmount = Number(amount);
     const course = COURSE_NAME;
 
-    if (!name || !phone || !mail) {
-      return res.status(400).json({ message: 'full_name, mobile, email are required' });
+    if (!name || !phone || !mail || amount === undefined || amount === null || amount === '') {
+      return res.status(400).json({ message: 'full_name, mobile, email, amount are required' });
     }
 
     if (!/^[A-Za-z ]{2,150}$/.test(name)) {
@@ -42,13 +42,17 @@ async function handler(req, res) {
       return res.status(400).json({ message: 'Invalid email address' });
     }
 
-    const amount = Number(COURSE_FEE);
+    if (Number.isNaN(enteredAmount) || enteredAmount <= 0) {
+      return res.status(400).json({ message: 'Invalid amount' });
+    }
+
+    const amountValue = Number(enteredAmount.toFixed(2));
 
     const enrollmentResult = await db.query(
       `INSERT INTO course_enrollments (full_name, mobile, email, course_name, amount, currency, status)
        VALUES ($1, $2, $3, $4, $5, 'INR', 'PENDING')
        RETURNING id, full_name, mobile, email, course_name, amount, currency, status, created_at`,
-      [name, phone, mail, course, amount]
+      [name, phone, mail, course, amountValue]
     );
 
     const enrollment = enrollmentResult.rows[0];
@@ -56,7 +60,7 @@ async function handler(req, res) {
     const razorpay = new RazorpayService();
 
     const order = await razorpay.createOrder({
-      amountPaise: Math.round(amount * 100),
+      amountPaise: Math.round(amountValue * 100),
       currency: 'INR',
       receipt: String(enrollment.id),
       notes: {
@@ -64,7 +68,8 @@ async function handler(req, res) {
         course_name: course,
         full_name: name,
         email: mail,
-        mobile: phone
+        mobile: phone,
+        entered_amount: String(amountValue)
       }
     });
 
@@ -101,7 +106,8 @@ async function handler(req, res) {
       course_name: enrollment.course_name,
       full_name: enrollment.full_name,
       email: enrollment.email,
-      mobile: enrollment.mobile
+      mobile: enrollment.mobile,
+      display_amount: amountValue
     });
   } catch (error) {
     return res.status(500).json({
